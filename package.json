@@ -1,0 +1,51 @@
+{
+  "name": "text-mapper",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "npm run build:live",
+    "test": "CFG_LOG_LEVEL=quiet nyc --reporter=text-summary mocha -r ts-node/register test/**",
+    "build": "tsc -p . && webpack --target node --mode development ./out_js/index.js",
+    "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "author": "rainu <rainu@raysha.de> (http://github.com/rainu)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.7.2",
+    "assert": "^2.0.0",
+    "mocha": "^6.2.0",
+    "nodemon": "^1.19.1",
+    "nyc": "^14.1.1",
+    "shebang-loader": "0.0.1",
+    "ts-node": "^8.3.0",
+    "typescript": "^3.5.3",
+    "webpack": "^4.39.2",
+    "webpack-cli": "^3.3.7"
+  },
+  "dependencies": {
+    "axios": "^0.19.0",
+    "fuse.js": "^3.4.5",
+    "mqtt": "^3.0.0",
+    "rainu-env-parser": "^1.1.2",
+    "winston": "^3.2.1"
+  }
+}
