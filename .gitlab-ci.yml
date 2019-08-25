@@ -1,0 +1,22 @@
+image: rainu/docker-node:11-alpine
+
+stages:
+  - test
+  - build
+
+testAndBuild:
+  stage: test
+  script:
+    - npm install
+    - npm run build
+    - npm test
+  coverage: /Lines:\s*([0-9.]*)%/
+
+dockerrize:
+  image: docker
+  stage: build
+  script:
+    - docker build . -t docker-repo.raysha.de/parfy-text-mapper
+    - docker push docker-repo.raysha.de/parfy-text-mapper
+  only:
+    - master
