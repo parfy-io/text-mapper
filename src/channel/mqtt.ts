@@ -27,31 +27,48 @@ export const newMQTTClient = (broker : string, topic : string) => {
 
       this.$client.on('message', (topic, message) => {
         const topicParts = topic.split('/')
-        const clientId = topicParts[topicParts.length - 1]
+        if(topicParts.length < 3) {
+          log.warn('Received a invalid message - invalid topic structure')
+          return
+        }
+        const correlationId = topicParts[topicParts.length - 1]
+        const clientId = topicParts[topicParts.length - 2]
 
         try{
           const parsedMessage = JSON.parse(message.toString())
-          if(!parsedMessage.correlationID) {
-            log.warn('Received a invalid message', {clientId, error: "no correlationId"})
-            return
-          }
           if(!parsedMessage.lookup) {
-            log.warn('Received a invalid message', {clientId, error: "no lookup"})
+            log.warn('Received a invalid message', {clientId, correlationId, error: "no lookup"})
             return
           }
 
-          callback.HandleLookupRequest(parsedMessage.correlationID, clientId, parsedMessage.lookup)
+          callback.HandleLookupRequest(correlationId, clientId, parsedMessage.lookup)
         }catch (e) {
-          log.warn('Received a invalid message', {clientId, error: e})
+          log.warn('Received a invalid message', {clientId, correlationId, error: e})
           return
         }
       })
     },
 
-    SendRecognition(userId : string, topic : string, correlationId : string) {
+    SendRecognition(userId : string, topic : string) {
       this.$client.publish(topic, JSON.stringify({
-        correlationID: correlationId,
         userID: userId,
+      }), {qos: 1})
+    },
+
+    SendInfoStatus(code : number, message : string, topic : string) {
+      this.sendStatus('info', code, message, topic)
+    },
+    SendErrorStatus(code : number, message : string , topic : string) {
+      this.sendStatus('error', code, message, topic)
+    },
+
+    sendStatus(level : string, code : number, message : string, topic : string) {
+      this.$client.publish(topic, JSON.stringify({
+        level: level,
+        source: 'text-mapper',
+        code: code,
+        message: message,
+        timestamp: new Date().toISOString()
       }), {qos: 1})
     }
   }

@@ -11,8 +11,9 @@ const defaults = {
       id: "text-mapper"
     },
     topic: {
-      in: "lookup/+",
-      out: "decide/__CLIENT_ID__"
+      in: "lookup/+/+",
+      out: "decide/__CLIENT_ID__/__CORRELATION_ID__",
+      status: "status/__CLIENT_ID__/__CORRELATION_ID__"
     }
   },
   client: {
@@ -33,7 +34,14 @@ const parseEnv = function() {
   return config
 }
 
+const buildTopic = (topicPattern, clientId, correlationId) => {
+  return topicPattern
+  .replace("__CLIENT_ID__", clientId)
+  .replace("__CORRELATION_ID__", correlationId)
+}
+
 export = {
   ...parseEnv(),
   parseEnv,
+  buildTopic
 }

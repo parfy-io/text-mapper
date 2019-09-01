@@ -147,14 +147,14 @@ describe('MQTT channel', () => {
 
     describe('will not call the callback on invalid messages', () => {
 
-      let testMessages = [
-          '',
-          JSON.stringify({}), //missing correlationId
-          JSON.stringify({correlationID: '<correlationId>'}), //missing lookup
+      let testCases = [
+        {topic: '/map/<clientId>/<correlationId>', message: ''}, //right topic, empty message
+        {topic: '/map/<clientId>/<correlationId>', message: JSON.stringify({})}, //right topic, missing lookup
+        {topic: '', message: JSON.stringify({lookup: ['']})}, //wrong topic right message
       ]
 
-      for(let i in testMessages) {
-        const curTestMessage = testMessages[i]
+      for(let i in testCases) {
+        const curTestCase = testCases[i]
         it(`... case #${i}`, (done) => {
           //given
           const toTest = mqtt.newMQTTClient("", "")
@@ -162,7 +162,7 @@ describe('MQTT channel', () => {
             // @ts-ignore
             on(event, cb) {
               if(event === 'message'){
-                cb("", Buffer.from(curTestMessage)) //call the callback
+                cb(curTestCase.topic, Buffer.from(curTestCase.message)) //call the callback
               }
             }
           }
@@ -187,7 +187,7 @@ describe('MQTT channel', () => {
     it('will call the callback on valid messages', (done) => {
       //given
       const testCorrelationId = "eafbd535-01df-403c-909e-aabec87c3c28"
-      const testMessage = JSON.stringify({correlationID: testCorrelationId, lookup: '<lookup>'})
+      const testMessage = JSON.stringify({lookup: '<lookup>'})
       const testClientId = '<clientId>'
       const toTest = mqtt.newMQTTClient("", "")
       toTest.$client = {
@@ -195,7 +195,7 @@ describe('MQTT channel', () => {
         on(event, cb) {
           if(event === 'message'){
             //call the callback
-            cb(`root/${testClientId}`, Buffer.from(testMessage))
+            cb(`root/${testClientId}/${testCorrelationId}`, Buffer.from(testMessage))
           }
         }
       }
@@ -225,14 +225,12 @@ describe('MQTT channel', () => {
       //given
       const testTopic = '<topic>'
       const testUserId = '<userId>'
-      const testCorrelationId = '<correlationId>'
       const toTest = mqtt.newMQTTClient("", "")
       toTest.$client = {
         // @ts-ignore
         publish(topic, message, options) {
           assert.strictEqual(topic, testTopic)
           assert.deepStrictEqual(JSON.parse(message), {
-            correlationID:testCorrelationId,
             userID: testUserId
           })
           assert.deepStrictEqual(options, { qos: 1 })
@@ -240,7 +238,69 @@ describe('MQTT channel', () => {
       }
 
       //when
-      toTest.SendRecognition(testUserId, testTopic, testCorrelationId)
+      toTest.SendRecognition(testUserId, testTopic)
+
+      done()
+    })
+
+  })
+
+  describe('SendInfoStatus', () => {
+
+    it('should publish the right message to the topic', (done) => {
+      //given
+      const testTopic = '<topic>'
+      const testMessage = '<message>'
+      const testCode = 1312
+      const toTest = mqtt.newMQTTClient("", "")
+      toTest.$client = {
+        // @ts-ignore
+        publish(topic, message, options) {
+          const parsed = JSON.parse(message)
+
+          assert.strictEqual(topic, testTopic)
+          assert.strictEqual(parsed.level, 'info')
+          assert.strictEqual(parsed.source, 'text-mapper')
+          assert.strictEqual(parsed.code, testCode)
+          assert.strictEqual(parsed.message, testMessage)
+          assert(parsed.timestamp)
+          assert.deepStrictEqual(options, { qos: 1 })
+        }
+      }
+
+      //when
+      toTest.SendInfoStatus(testCode, testMessage, testTopic)
+
+      done()
+    })
+
+  })
+
+  describe('SendErrorStatus', () => {
+
+    it('should publish the right message to the topic', (done) => {
+      //given
+      const testTopic = '<topic>'
+      const testMessage = '<message>'
+      const testCode = 1312
+      const toTest = mqtt.newMQTTClient("", "")
+      toTest.$client = {
+        // @ts-ignore
+        publish(topic, message, options) {
+          const parsed = JSON.parse(message)
+
+          assert.strictEqual(topic, testTopic)
+          assert.strictEqual(parsed.level, 'error')
+          assert.strictEqual(parsed.source, 'text-mapper')
+          assert.strictEqual(parsed.code, testCode)
+          assert.strictEqual(parsed.message, testMessage)
+          assert(parsed.timestamp)
+          assert.deepStrictEqual(options, { qos: 1 })
+        }
+      }
+
+      //when
+      toTest.SendErrorStatus(testCode, testMessage, testTopic)
 
       done()
     })
