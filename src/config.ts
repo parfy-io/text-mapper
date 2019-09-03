@@ -7,6 +7,8 @@ const defaults = {
   },
   mqtt: {
     broker: "localhost:1883",
+    username: null,
+    password: null,
     client: {
       id: "text-mapper"
     },

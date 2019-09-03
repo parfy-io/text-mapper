@@ -9,9 +9,17 @@ export interface Callback {
   HandleError(error : any)
 }
 
-export const newMQTTClient = (broker : string, topic : string) => {
+export const newMQTTClient = (broker : string, topic : string, username : string = "", password : string = "") => {
+  let options = {}
+  if(username){
+    options = {
+      username: username,
+      password: password
+    }
+  }
+
   return {
-    $client: $mqttConnect(`mqtt://${broker}`),
+    $client: $mqttConnect(`mqtt://${broker}`, options),
 
     Start(callback : Callback) {
       this.$client.on('connect', () => {

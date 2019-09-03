@@ -11,11 +11,35 @@ describe('MQTT channel', () => {
   it('configure mqtt correctly', () => {
     //given
     const broker = '<broker>'
+    const username = '<username>'
+    const password = '<password>'
     const topic = '<topic>'
 
     // @ts-ignore
-    mqtt.$mqttConnect = (brokerUrl) => {
+    mqtt.$mqttConnect = (brokerUrl, options) => {
       assert.strictEqual(brokerUrl, `mqtt://${broker}`)
+      assert.deepStrictEqual(options, {
+        username, password
+      })
+      return '<mqttClient>'
+    }
+
+    //when
+    const toTest = mqtt.newMQTTClient(broker, topic, username, password)
+
+    //then
+    assert.strictEqual('<mqttClient>', toTest.$client)
+  })
+
+  it('configure mqtt correctly without user credentials', () => {
+    //given
+    const broker = '<broker>'
+    const topic = '<topic>'
+
+    // @ts-ignore
+    mqtt.$mqttConnect = (brokerUrl, options) => {
+      assert.strictEqual(brokerUrl, `mqtt://${broker}`)
+      assert.deepStrictEqual(options, {})
       return '<mqttClient>'
     }
 
