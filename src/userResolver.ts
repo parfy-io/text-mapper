@@ -22,19 +22,15 @@ export const newUserResolver = (userServiceBaseUrl : string, minConfidence : num
     },
 
     filterPotentialUsers(users : Array<userService.User>, text: Array<string>) : Array<PotentialUser> {
-      let preparedUsers = users.map(user => {
-        return {
-          id: user.id,
-          fullName: user.names.join(' ')
-        }
-      })
-      let fuse = new Fuse(preparedUsers, this.$fuseOptions)
+      let fuse = new Fuse(text, this.$fuseOptions)
       let discoveries = {}
 
-      for(let curText of text) {
-        for(let result of fuse.search(curText)){
+      for(let curUser of users) {
+        let normalizedName = curUser.names.join(' ')
+
+        for(let result of fuse.search(normalizedName)){
           // @ts-ignore
-          let userId = result.item.id
+          let userId = curUser.id
           // @ts-ignore
           let confidence = score2confidence(result.score)
 
