@@ -18,7 +18,7 @@ describe('UserResolver', () => {
           { id: "2", names: ["Jon", "Maiermann"] },
           { id: "3", names: ["Günter", "Müller"] },
         ]
-        let toTest = userResolver.newUserResolver('<baseUrl>', 80)
+        let toTest = userResolver.newUserResolver('<baseUrl>', 70)
 
         //when
         let result = toTest.filterPotentialUsers(testUsers, curUseCase.text)

@@ -1,8 +1,5 @@
 import userService = require("./client/userService");
-import Fuse = require("fuse.js");
-
-const score2confidence = (score) => (1 - score) * 100
-const percentage2score = (percentage) =>  1 - (percentage / 100)
+import FuzzySet = require("fuzzyset.js");
 
 interface PotentialUser extends userService.User {
   confidence: number
@@ -11,31 +8,26 @@ interface PotentialUser extends userService.User {
 export const newUserResolver = (userServiceBaseUrl : string, minConfidence : number = 90) => {
   return {
     $userServiceClient: userService.newUserService(userServiceBaseUrl),
-    $fuseOptions: {
-      caseSensitive: false,
-      shouldSort: true,
-      includeScore: true,
-      location: 0,
-      threshold: percentage2score(minConfidence),
-      distance: 100,
-      keys: ['fullName']
-    },
 
     filterPotentialUsers(users : Array<userService.User>, text: Array<string>) : Array<PotentialUser> {
-      let fuse = new Fuse(text, this.$fuseOptions)
+      let fuzzySet = FuzzySet(text, false)
       let discoveries = {}
 
       for(let curUser of users) {
         let normalizedName = curUser.names.join(' ')
 
-        for(let result of fuse.search(normalizedName)){
-          // @ts-ignore
-          let userId = curUser.id
-          // @ts-ignore
-          let confidence = score2confidence(result.score)
+        let results = fuzzySet.get(normalizedName) || []
+        let confidence = 0
 
-          if(!discoveries[userId]) discoveries[userId] = 0
-          if(discoveries[userId] < confidence) discoveries[userId] = confidence
+        for(let result of results) {
+          let curConfidence = result[0] * 100
+          if(confidence < curConfidence) {
+            confidence = curConfidence
+          }
+        }
+
+        if(confidence >= minConfidence) {
+          discoveries[curUser.id] = confidence
         }
       }
 

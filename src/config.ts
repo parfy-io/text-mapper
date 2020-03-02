@@ -25,7 +25,7 @@ const defaults = {
   },
   mapper: {
     confidence: {
-      min: 80
+      min: 70
     }
   }
 }

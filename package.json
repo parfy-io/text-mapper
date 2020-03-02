@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "fuse.js": "^3.4.5",
+    "fuzzyset.js": "0.0.91",
     "mqtt": "^3.0.0",
     "rainu-env-parser": "^1.1.2",
     "winston": "^3.2.1"
