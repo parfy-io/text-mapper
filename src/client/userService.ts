@@ -17,13 +17,12 @@ export const newUserService = (baseUrl : string) : UserService => {
     $client: axios.default,
 
     GetUsers(clientId: string, correlationId: string, offset: number = 0, limit: number = 500): Promise<Array<User> | Error> {
-      return this.$client.get(`${baseUrl}/v1/users`, {
+      return this.$client.get(`${baseUrl}/v1/clients/${clientId}/users`, {
         headers: {
           "X-Correlation-Id": correlationId,
           "User-Agent": "text-mapper"
         },
         params: {
-          "clientID": clientId,
           "offset": offset,
           "limit": limit,
         }

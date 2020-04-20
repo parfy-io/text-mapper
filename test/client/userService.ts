@@ -19,10 +19,9 @@ describe('UserService', () => {
       const toTest = userService.newUserService('<baseUrl>')
       toTest.$client = {
         get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/users`)
+          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
           assert.deepStrictEqual(config.params, {
-            "clientID": "<clientId>",
             "offset": 1,
             "limit": 13
           })
@@ -48,10 +47,9 @@ describe('UserService', () => {
       const toTest = userService.newUserService('<baseUrl>')
       toTest.$client = {
         get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/users`)
+          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
           assert.deepStrictEqual(config.params, {
-            "clientID": "<clientId>",
             "offset": 1,
             "limit": 13
           })
@@ -77,10 +75,9 @@ describe('UserService', () => {
       const toTest = userService.newUserService('<baseUrl>')
       toTest.$client = {
         get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/users`)
+          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
           assert.deepStrictEqual(config.params, {
-            "clientID": "<clientId>",
             "offset": 1,
             "limit": 13
           })
