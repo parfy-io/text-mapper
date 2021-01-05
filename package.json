@@ -42,7 +42,7 @@
     "webpack-cli": "^3.3.7"
   },
   "dependencies": {
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "fuzzyset.js": "0.0.91",
     "mqtt": "^3.0.0",
     "rainu-env-parser": "^1.1.2",
