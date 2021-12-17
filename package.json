@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "start": "npm run build:live",
-    "test": "CFG_LOG_LEVEL=quiet nyc --reporter=text-summary mocha -r ts-node/register test/**",
+    "test": "CFG_LOG_LEVEL=quiet nyc --reporter=text-summary mocha -r ts-node/register --recursive \"test/**\"",
     "build": "tsc -p . && webpack --target node --mode development ./out_js/index.js",
     "build:live": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts"
   },
@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "axios": "^0.24.0",
-    "fuzzyset.js": "1.0.7",
+    "fuzzyset.js": "0.0.91",
     "mqtt": "^4.2.8",
     "rainu-env-parser": "^1.1.2",
     "winston": "^3.3.3"

@@ -16,12 +16,15 @@ describe('UserService', () => {
 
     it('should provide the origin error', (done) => {
       //given
-      const toTest = userService.newUserService('<baseUrl>')
+      const toTest = userService.newUserService('<baseUrl>', '<apikey>')
       toTest.$client = {
-        get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
+        post(url, data, config) {
+          assert.strictEqual(url, `<baseUrl>`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
-          assert.deepStrictEqual(config.params, {
+          assert.strictEqual(config.headers["Authorization"], "Bearer <apikey>")
+          assert.strictEqual(data.query, userService.gqlGetUsers)
+          assert.deepStrictEqual(data.variables, {
+            "clientName": "<clientId>",
             "offset": 1,
             "limit": 13
           })
@@ -46,10 +49,13 @@ describe('UserService', () => {
       //given
       const toTest = userService.newUserService('<baseUrl>')
       toTest.$client = {
-        get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
+        post(url, data, config) {
+          assert.strictEqual(url, `<baseUrl>`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
-          assert.deepStrictEqual(config.params, {
+          assert.strictEqual(config.headers["Authorization"], undefined)
+          assert.strictEqual(data.query, userService.gqlGetUsers)
+          assert.deepStrictEqual(data.variables, {
+            "clientName": "<clientId>",
             "offset": 1,
             "limit": 13
           })
@@ -70,33 +76,44 @@ describe('UserService', () => {
       })
     })
 
-    it('should provide the response from user-service', (done) => {
+    it('should provide the response from user-service', async () => {
       //given
       const toTest = userService.newUserService('<baseUrl>')
       toTest.$client = {
-        get(url, config) {
-          assert.strictEqual(url, `<baseUrl>/v1/clients/<clientId>/users`)
+        post(url, data, config) {
+          assert.strictEqual(url, `<baseUrl>`)
           assert.strictEqual(config.headers["X-Correlation-Id"], "<correlationId>")
-          assert.deepStrictEqual(config.params, {
+          assert.strictEqual(data.query, userService.gqlGetUsers)
+          assert.deepStrictEqual(data.variables, {
+            "clientName": "<clientId>",
             "offset": 1,
             "limit": 13
           })
 
-          return Promise.resolve({data: '<data>'})
+          return Promise.resolve({
+            data: {
+              "data": {
+                "employees": {
+                  "data": [{
+                    "id": "1",
+                    "attributes": {
+                      "names": [ "Rainu", "Raysha" ]
+                    }
+                  }]
+                }
+              }
+            }
+          })
         }
       }
 
       //when
-      let result = toTest.GetUsers('<clientId>', '<correlationId>', 1, 13)
+      const result = await toTest.GetUsers('<clientId>', '<correlationId>', 1, 13)
 
       //then
-      result.then((resp) => {
-        assert.strictEqual(resp, '<data>')
-        done()
-      }).catch((err) => {
-        assert.fail("It should be rejected!")
-        done()
-      })
+      assert.deepEqual(result, [{
+        id: "1", names: ["Rainu", "Raysha"]
+      }])
     })
 
   })

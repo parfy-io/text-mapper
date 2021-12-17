@@ -11,27 +11,53 @@ export interface UserService {
   [propName: string]: any;
 }
 
-export const newUserService = (baseUrl : string) : UserService => {
+export const gqlGetUsers = `query GetUsers($clientName: String, $offset: Int, $limit: Int) {
+  employees(filters: {
+    client: {name: {eq: $clientName}}
+  }, pagination: { start: $offset, limit: $limit}) {
+    data {
+      id
+      attributes {
+        names
+      }
+    }
+  }
+}`
+
+export const newUserService = (baseUrl: string, apiKey: string | undefined = undefined) : UserService => {
+  const defaultHeaders = {
+    "User-Agent": "text-mapper"
+  }
+  if(apiKey) {
+    defaultHeaders['Authorization'] = `Bearer ${apiKey}`
+  }
 
   return {
     $client: axios.default,
 
-    GetUsers(clientId: string, correlationId: string, offset: number = 0, limit: number = 500): Promise<Array<User> | Error> {
-      return this.$client.get(`${baseUrl}/v1/clients/${clientId}/users`, {
+    graphql(query: string, variables: any, correlationId: string): Promise<axios.AxiosResponse> {
+      return this.$client.post(`${baseUrl}`, { query, variables }, {
         headers: {
+          ...defaultHeaders,
           "X-Correlation-Id": correlationId,
-          "User-Agent": "text-mapper"
-        },
-        params: {
-          "offset": offset,
-          "limit": limit,
         }
-      }).then(resp => {
-        if(!resp || !resp.data) {
+      })
+    },
+
+    GetUsers(clientName: string, correlationId: string, offset: number = 0, limit: number = 500): Promise<Array<User> | Error> {
+      const variables = {
+        clientName, offset, limit
+      }
+      return this.graphql(gqlGetUsers, variables, correlationId).then(resp => {
+        if(!resp || !resp.data || !resp.data.data || !resp.data.data.employees || !resp.data.data.employees.data) {
           throw new Error("Error while calling UserService: the response is invalid.")
         }
 
-        return resp.data
+        return resp.data.data.employees.data.map(employee => {
+          return {
+            id: employee.id, names: employee.attributes.names
+          }
+        })
       })
     }
   }

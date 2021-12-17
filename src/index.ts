@@ -3,7 +3,7 @@ import log = require('./log')
 import mqtt = require('./channel/mqtt')
 import ur = require("./userResolver");
 
-let userResolver = ur.newUserResolver(cfg.client.user.base, cfg.mapper.confidence.min)
+let userResolver = ur.newUserResolver(cfg.client.user.base, cfg.client.user.apikey, cfg.mapper.confidence.min)
 let mqttClient = mqtt.newMQTTClient(cfg.mqtt.broker, cfg.mqtt.topic.in, cfg.mqtt.username, cfg.mqtt.password)
 mqttClient.Start({
   HandleLookupRequest: (correlationId, clientId, text) => {

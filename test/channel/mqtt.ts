@@ -122,6 +122,7 @@ describe('MQTT channel', () => {
         },
         // @ts-ignore
         subscribe(topic, opts, cb){
+          // @ts-ignore
           cb('someError') //simulate error
         }
       }
@@ -151,6 +152,7 @@ describe('MQTT channel', () => {
         },
         // @ts-ignore
         subscribe(topic, opts, cb){
+          // @ts-ignore
           cb() //simulate no error
         }
       }

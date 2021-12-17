@@ -20,7 +20,8 @@ const defaults = {
   },
   client: {
     user: {
-      base: 'http://user-service:80'
+      base: 'http://user-service:1337/graphql',
+      apikey: undefined,
     },
   },
   mapper: {

@@ -18,7 +18,7 @@ describe('UserResolver', () => {
           { id: "2", names: ["Jon", "Maiermann"] },
           { id: "3", names: ["Günter", "Müller"] },
         ]
-        let toTest = userResolver.newUserResolver('<baseUrl>', 70)
+        let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>', 70)
 
         //when
         let result = toTest.filterPotentialUsers(testUsers, curUseCase.text)
@@ -34,7 +34,7 @@ describe('UserResolver', () => {
 
     it('should process until last user', (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       const testClientId = '<clientId>'
       const testCorrelationId = '<correlationId>'
       const testText = ['<text#1>', '<text#2>']
@@ -81,7 +81,7 @@ describe('UserResolver', () => {
 
     it('should filter out all non-potential users', (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       toTest.filterPotentialUsers = () => {
         return []
       }
@@ -108,7 +108,7 @@ describe('UserResolver', () => {
 
     it('should ignore broken pages', (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       toTest.filterPotentialUsers = (users) => {
         return users.map(u => {return {...u, confidence: 0}})
       }
@@ -151,7 +151,7 @@ describe('UserResolver', () => {
 
     it(`should return the user's id`, (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       const testClientId = '<clientId>'
       const testCorrelationId = '<correlationId>'
       const testText = ['<text#1>', '<text#2>']
@@ -180,7 +180,7 @@ describe('UserResolver', () => {
 
     it(`should return the best user's id`, (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       const testClientId = '<clientId>'
       const testCorrelationId = '<correlationId>'
       const testText = ['<text#1>', '<text#2>']
@@ -210,7 +210,7 @@ describe('UserResolver', () => {
 
     it(`should return null if no user was matched`, (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       toTest.getPotentialUsers = () => {
         return Promise.resolve([])
       }
@@ -230,7 +230,7 @@ describe('UserResolver', () => {
 
     it(`should return null if no user was matched #2`, (done) => {
       //given
-      let toTest = userResolver.newUserResolver('<baseUrl>')
+      let toTest = userResolver.newUserResolver('<baseUrl>', '<apikey>')
       // @ts-ignore
       toTest.getPotentialUsers = () => {
         return Promise.resolve(null)

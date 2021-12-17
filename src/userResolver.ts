@@ -5,9 +5,9 @@ interface PotentialUser extends userService.User {
   confidence: number
 }
 
-export const newUserResolver = (userServiceBaseUrl : string, minConfidence : number = 90) => {
+export const newUserResolver = (userServiceBaseUrl : string, userServiceApiKey : string | undefined, minConfidence : number = 90) => {
   return {
-    $userServiceClient: userService.newUserService(userServiceBaseUrl),
+    $userServiceClient: userService.newUserService(userServiceBaseUrl, userServiceApiKey),
 
     filterPotentialUsers(users : Array<userService.User>, text: Array<string>) : Array<PotentialUser> {
       let fuzzySet = FuzzySet(text, false)
