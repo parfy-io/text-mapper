@@ -1,4 +1,4 @@
-FROM node:11-alpine as build
+FROM node:17-alpine as build
 
 WORKDIR /build
 ADD src /build/src
@@ -8,7 +8,7 @@ ADD tsconfig.json /build
 
 RUN npm i && npm run build
 
-FROM node:11-alpine
+FROM node:17-alpine
 
 WORKDIR /app
 COPY --from=build /build/dist/main.js /app/main.js
